@@ -2,24 +2,26 @@
 
 import { loadPreferences } from './utils/storage.js';
 import { assemblePayload } from './utils/assemblePayload.js';
-import { optimizePrompt } from './utils/geminiClient.js';
+import { generateOptimizedPrompt } from './utils/geminiClient.js';
 
-const elements = {
-  rawPrompt: document.getElementById('rawPrompt'),
-  scrapeClaude: document.getElementById('scrapeClaude'),
-  fileInput: document.getElementById('fileInput'),
-  fileList: document.getElementById('fileList'),
-  optimizeBtn: document.getElementById('optimizeBtn'),
-  status: document.getElementById('status'),
-  outputGroup: document.getElementById('outputGroup'),
-  optimizedPrompt: document.getElementById('optimizedPrompt'),
-  copyBtn: document.getElementById('copyBtn')
-};
-
+let elements = {};
 let attachedFiles = [];
 
 // Initialize popup
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize elements after DOM is loaded
+  elements = {
+    rawPrompt: document.getElementById('rawPrompt'),
+    scrapeClaude: document.getElementById('scrapeClaude'),
+    fileInput: document.getElementById('fileInput'),
+    fileList: document.getElementById('fileList'),
+    optimizeBtn: document.getElementById('optimizeBtn'),
+    status: document.getElementById('status'),
+    outputGroup: document.getElementById('outputGroup'),
+    optimizedPrompt: document.getElementById('optimizedPrompt'),
+    copyBtn: document.getElementById('copyBtn')
+  };
+
   // Check if all required elements exist
   if (!elements.rawPrompt || !elements.optimizeBtn) {
     console.error('Required elements not found in popup.html');
@@ -91,8 +93,14 @@ async function handleOptimize() {
 
   // Show loading state
   elements.optimizeBtn.disabled = true;
-  elements.optimizeBtn.querySelector('.btn-text').textContent = 'Optimizing...';
-  elements.optimizeBtn.querySelector('.spinner')?.classList.remove('hidden');
+  const btnText = elements.optimizeBtn.querySelector('.btn-text');
+  if (btnText) {
+    btnText.textContent = 'Optimizing...';
+  }
+  const spinner = elements.optimizeBtn.querySelector('.spinner');
+  if (spinner) {
+    spinner.classList.remove('hidden');
+  }
 
   try {
     const prefs = await loadPreferences();
@@ -110,15 +118,15 @@ async function handleOptimize() {
     }
 
     // Assemble the payload
-    const payload = assemblePayload({
+    const payload = assemblePayload(
       rawPrompt,
-      claudeContext,
-      attachedFiles,
-      preferences: prefs
-    });
+      prefs,
+      claudeContext ? [claudeContext] : [],
+      attachedFiles
+    );
 
     // Call Gemini API
-    const optimized = await optimizePrompt(payload, prefs.apiKey);
+    const optimized = await generateOptimizedPrompt(payload, prefs.apiKey);
 
     // Show results
     if (elements.optimizedPrompt) {
@@ -135,9 +143,17 @@ async function handleOptimize() {
     showStatus(error.message || 'Failed to optimize prompt', 'error');
   } finally {
     // Reset button state
-    elements.optimizeBtn.disabled = false;
-    elements.optimizeBtn.querySelector('.btn-text').textContent = 'Optimize with Gemini';
-    elements.optimizeBtn.querySelector('.spinner')?.classList.add('hidden');
+    if (elements.optimizeBtn) {
+      elements.optimizeBtn.disabled = false;
+      const btnText = elements.optimizeBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'Optimize with Gemini';
+      }
+      const spinner = elements.optimizeBtn.querySelector('.spinner');
+      if (spinner) {
+        spinner.classList.add('hidden');
+      }
+    }
   }
 }
 
