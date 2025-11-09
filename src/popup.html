@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Prompt Optimizer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Optimize for Claude</h1>
+    
+    <div class="input-group">
+      <label for="rawPrompt">Raw Prompt</label>
+      <textarea id="rawPrompt" placeholder="Enter your raw prompt here..."></textarea>
+    </div>
+    
+    <div class="checkbox-group">
+      <label>
+        <input type="checkbox" id="scrapeClaude">
+        Try to read current Claude tab
+      </label>
+    </div>
+    
+    <div class="input-group">
+      <label for="fileInput">Attach Files (optional)</label>
+      <input type="file" id="fileInput" multiple accept=".txt,.js,.html,.css,.md,.json,.py,.java,.cpp,.c,.rs,.go">
+      <div id="fileList" class="file-list"></div>
+    </div>
+    
+    <button id="optimizeBtn" class="btn btn-primary">
+      <span class="btn-text">Optimize with Gemini</span>
+      <span class="spinner hidden"></span>
+    </button>
+    
+    <div id="status" class="status"></div>
+    
+    <div class="output-group hidden" id="outputGroup">
+      <label for="optimizedPrompt">Optimized Prompt</label>
+      <textarea id="optimizedPrompt" readonly></textarea>
+      <button id="copyBtn" class="btn btn-secondary">Copy to Clipboard</button>
+    </div>
+  </div>
+  
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
