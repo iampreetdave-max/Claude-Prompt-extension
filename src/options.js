@@ -3,76 +3,92 @@
 
 import { savePreferences, loadPreferences } from './utils/storage.js';
 
-const elements = {
-  apiKey: document.getElementById('apiKey'),
-  noReadme: document.getElementById('noReadme'),
-  fullCode: document.getElementById('fullCode'),
-  shortSummary: document.getElementById('shortSummary'),
-  preferVanilla: document.getElementById('preferVanilla'),
-  alwaysInclude: document.getElementById('alwaysInclude'),
-  snippetsList: document.getElementById('snippetsList'),
-  addSnippet: document.getElementById('addSnippet'),
-  saveBtn: document.getElementById('saveBtn'),
-  status: document.getElementById('status')
-};
-
+let elements = {};
 let snippets = [];
 
 // Load settings on page load
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize elements after DOM is loaded
+  elements = {
+    apiKey: document.getElementById('apiKey'),
+    noReadme: document.getElementById('noReadme'),
+    fullCode: document.getElementById('fullCode'),
+    shortSummary: document.getElementById('shortSummary'),
+    preferVanilla: document.getElementById('preferVanilla'),
+    alwaysInclude: document.getElementById('alwaysInclude'),
+    snippetsList: document.getElementById('snippetsList'),
+    addSnippet: document.getElementById('addSnippet'),
+    saveBtn: document.getElementById('saveBtn'),
+    status: document.getElementById('status')
+  };
+
+  // Check if required elements exist
+  if (!elements.apiKey || !elements.saveBtn) {
+    console.error('Required elements not found in options.html');
+    return;
+  }
+
   const prefs = await loadPreferences();
-  
-  elements.apiKey.value = prefs.apiKey || '';
-  elements.noReadme.checked = prefs.noReadme !== false;
-  elements.fullCode.checked = prefs.fullCode !== false;
-  elements.shortSummary.checked = prefs.shortSummary !== false;
-  elements.preferVanilla.checked = prefs.preferVanilla !== false;
-  elements.alwaysInclude.value = prefs.alwaysIncludeText || '';
-  
+
+  if (elements.apiKey) elements.apiKey.value = prefs.apiKey || '';
+  if (elements.noReadme) elements.noReadme.checked = prefs.noReadme !== false;
+  if (elements.fullCode) elements.fullCode.checked = prefs.fullCode !== false;
+  if (elements.shortSummary) elements.shortSummary.checked = prefs.shortSummary !== false;
+  if (elements.preferVanilla) elements.preferVanilla.checked = prefs.preferVanilla !== false;
+  if (elements.alwaysInclude) elements.alwaysInclude.value = prefs.alwaysIncludeText || '';
+
   snippets = prefs.savedSnippets || [];
   renderSnippets();
-});
 
-// Save settings
-elements.saveBtn.addEventListener('click', async () => {
-  const prefs = {
-    apiKey: elements.apiKey.value.trim(),
-    noReadme: elements.noReadme.checked,
-    fullCode: elements.fullCode.checked,
-    shortSummary: elements.shortSummary.checked,
-    preferVanilla: elements.preferVanilla.checked,
-    alwaysIncludeText: elements.alwaysInclude.value.trim(),
-    savedSnippets: snippets
-  };
-  
-  try {
-    await savePreferences(prefs);
-    showStatus('Settings saved successfully!', 'success');
-  } catch (error) {
-    showStatus('Failed to save settings', 'error');
+  // Set up event listeners after elements are initialized
+  if (elements.saveBtn) {
+    elements.saveBtn.addEventListener('click', async () => {
+      if (!elements.apiKey) return;
+
+      const prefs = {
+        apiKey: elements.apiKey.value.trim(),
+        noReadme: elements.noReadme?.checked ?? true,
+        fullCode: elements.fullCode?.checked ?? true,
+        shortSummary: elements.shortSummary?.checked ?? true,
+        preferVanilla: elements.preferVanilla?.checked ?? true,
+        alwaysIncludeText: elements.alwaysInclude?.value.trim() ?? '',
+        savedSnippets: snippets
+      };
+
+      try {
+        await savePreferences(prefs);
+        showStatus('Settings saved successfully!', 'success');
+      } catch (error) {
+        showStatus('Failed to save settings', 'error');
+      }
+    });
+  }
+
+  // Snippet management
+  if (elements.addSnippet) {
+    elements.addSnippet.addEventListener('click', () => {
+      snippets.push('');
+      renderSnippets();
+    });
   }
 });
 
-// Snippet management
-elements.addSnippet.addEventListener('click', () => {
-  snippets.push('');
-  renderSnippets();
-});
-
 function renderSnippets() {
+  if (!elements.snippetsList) return;
+
   elements.snippetsList.innerHTML = '';
-  
+
   snippets.forEach((snippet, index) => {
     const div = document.createElement('div');
     div.className = 'snippet-item';
-    
+
     const textarea = document.createElement('textarea');
     textarea.value = snippet;
     textarea.placeholder = 'Enter snippet text...';
     textarea.addEventListener('input', (e) => {
       snippets[index] = e.target.value;
     });
-    
+
     const removeBtn = document.createElement('button');
     removeBtn.className = 'remove-btn';
     removeBtn.textContent = 'Remove';
@@ -80,7 +96,7 @@ function renderSnippets() {
       snippets.splice(index, 1);
       renderSnippets();
     });
-    
+
     div.appendChild(textarea);
     div.appendChild(removeBtn);
     elements.snippetsList.appendChild(div);
@@ -88,10 +104,14 @@ function renderSnippets() {
 }
 
 function showStatus(message, type) {
+  if (!elements.status) return;
+
   elements.status.textContent = message;
   elements.status.className = `status ${type}`;
-  
+
   setTimeout(() => {
-    elements.status.className = 'status';
+    if (elements.status) {
+      elements.status.className = 'status';
+    }
   }, 3000);
 }
