@@ -1,36 +1,29 @@
 {
   "manifest_version": 3,
   "name": "Claude Prompt Optimizer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Optimize prompts for Claude using Gemini API",
   "action": {
     "default_popup": "src/popup.html",
     "default_icon": {
-      "16": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><rect width='16' height='16' fill='%234A90E2'/></svg>",
-      "48": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><rect width='48' height='48' fill='%234A90E2'/></svg>",
-      "128": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><rect width='128' height='128' fill='%234A90E2'/></svg>"
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
     }
   },
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting",
-    "clipboardWrite"
-  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage", "activeTab", "scripting", "clipboardWrite"],
   "host_permissions": [
     "https://claude.ai/*",
     "https://generativelanguage.googleapis.com/*"
   ],
-  "background": {
-    "service_worker": "src/background.js",
-    "type": "module"
-  },
+  "background": { "service_worker": "src/background.js", "type": "module" },
   "content_scripts": [
-    {
-      "matches": ["https://claude.ai/*"],
-      "js": ["src/content-script.js"],
-      "run_at": "document_idle"
-    }
+    { "matches": ["https://claude.ai/*"], "js": ["src/content-script.js"], "run_at": "document_idle" }
   ],
   "options_page": "src/options.html"
 }
