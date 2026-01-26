@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Prompt Optimizer - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="options-header">
+      <h1>Settings</h1>
+      <div class="header-actions">
+        <button id="exportBtn" class="btn btn-outline">Export</button>
+        <button id="importBtn" class="btn btn-outline">Import</button>
+        <input type="file" id="importFile" accept=".json" hidden>
+      </div>
+    </header>
+
+    <!-- AI Provider Section -->
+    <div class="section">
+      <h2>AI Provider</h2>
+      <div class="provider-tabs">
+        <button class="provider-tab active" data-provider="gemini">
+          <span class="provider-icon">G</span>
+          <span>Gemini (Free)</span>
+        </button>
+        <button class="provider-tab" data-provider="openai">
+          <span class="provider-icon">O</span>
+          <span>OpenAI</span>
+        </button>
+        <button class="provider-tab" data-provider="ollama">
+          <span class="provider-icon">L</span>
+          <span>Ollama (Local)</span>
+        </button>
+      </div>
+
+      <!-- Gemini Settings -->
+      <div id="geminiSettings" class="provider-settings">
+        <div class="input-group">
+          <label for="apiKey">Gemini API Key</label>
+          <div class="api-key-wrapper">
+            <input type="password" id="apiKey" placeholder="Enter your Gemini API key">
+            <button id="testGeminiBtn" class="btn btn-test">Test</button>
+          </div>
+          <div id="geminiStatus" class="api-status"></div>
+          <p class="hint">Get your FREE key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> (15 req/min free)</p>
+        </div>
+      </div>
+
+      <!-- OpenAI Settings -->
+      <div id="openaiSettings" class="provider-settings hidden">
+        <div class="input-group">
+          <label for="openaiKey">OpenAI API Key</label>
+          <div class="api-key-wrapper">
+            <input type="password" id="openaiKey" placeholder="Enter your OpenAI API key">
+            <button id="testOpenaiBtn" class="btn btn-test">Test</button>
+          </div>
+          <div id="openaiStatus" class="api-status"></div>
+          <p class="hint">Get key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a> (paid)</p>
+        </div>
+      </div>
+
+      <!-- Ollama Settings -->
+      <div id="ollamaSettings" class="provider-settings hidden">
+        <div class="input-group">
+          <label for="ollamaUrl">Ollama Server URL</label>
+          <div class="api-key-wrapper">
+            <input type="text" id="ollamaUrl" placeholder="http://localhost:11434">
+            <button id="testOllamaBtn" class="btn btn-test">Test</button>
+          </div>
+          <div id="ollamaStatus" class="api-status"></div>
+          <p class="hint">Run Ollama locally: <code>ollama serve</code> then <code>ollama pull llama3.2</code></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme Section -->
+    <div class="section">
+      <h2>Appearance</h2>
+      <div class="theme-selector">
+        <button class="theme-btn" data-theme="light">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+          </svg>
+          Light
+        </button>
+        <button class="theme-btn active" data-theme="auto">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2v20M2 12h20"></path>
+          </svg>
+          Auto
+        </button>
+        <button class="theme-btn" data-theme="dark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          Dark
+        </button>
+      </div>
+    </div>
+
+    <!-- Preferences Section -->
+    <div class="section">
+      <h2>Default Preferences</h2>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="noReadme" checked>
+          <span>No README - provide runnable code only</span>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="fullCode" checked>
+          <span>Complete code blocks (no placeholders)</span>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="shortSummary" checked>
+          <span>Minimal explanations, brief summary</span>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="preferVanilla" checked>
+          <span>Prefer vanilla JS and standard APIs</span>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="autoOptimize">
+          <span>Auto-optimize as you type (experimental)</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Always Include Section -->
+    <div class="section">
+      <h2>Always Include</h2>
+      <textarea id="alwaysInclude" placeholder="Instructions to always add to prompts (e.g., coding standards, project context)..."></textarea>
+      <p class="hint">This text will be included in every optimization request.</p>
+    </div>
+
+    <!-- Snippets Section -->
+    <div class="section">
+      <h2>Saved Snippets</h2>
+      <p class="hint">Reusable code or text snippets to reference in prompts.</p>
+      <div id="snippetsList"></div>
+      <button id="addSnippet" class="btn btn-secondary">+ Add Snippet</button>
+    </div>
+
+    <!-- Keyboard Shortcuts Info -->
+    <div class="section">
+      <h2>Keyboard Shortcuts</h2>
+      <div class="shortcuts-list">
+        <div class="shortcut">
+          <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd>
+          <span>Open extension popup</span>
+        </div>
+        <div class="shortcut">
+          <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
+          <span>Toggle side panel</span>
+        </div>
+        <div class="shortcut">
+          <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
+          <span>Optimize prompt (in popup)</span>
+        </div>
+      </div>
+      <p class="hint">Customize shortcuts at <a href="chrome://extensions/shortcuts" id="shortcutsLink">chrome://extensions/shortcuts</a></p>
+    </div>
+
+    <!-- Save Button -->
+    <button id="saveBtn" class="btn btn-primary btn-full">Save Settings</button>
+    <div id="status" class="status"></div>
+
+    <!-- Version -->
+    <div class="version">
+      Claude Prompt Optimizer v2.0.0
+    </div>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

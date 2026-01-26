@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Prompt Optimizer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>Claude Optimizer</h1>
+      <div class="header-actions">
+        <button id="themeToggle" class="icon-btn" title="Toggle theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+          </svg>
+          <svg class="icon-moon hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <button id="sidePanelBtn" class="icon-btn" title="Open side panel (Ctrl+Shift+P)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="15" y1="3" x2="15" y2="21"></line>
+          </svg>
+        </button>
+        <button id="historyBtn" class="icon-btn" title="History">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </button>
+        <button id="settingsBtn" class="icon-btn" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Claude Detection Banner -->
+    <div id="claudeDetected" class="claude-detected hidden">
+      <span class="claude-badge">On Claude.ai</span>
+      <span class="claude-hint">Auto-capture enabled</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="prompt">Prompt</button>
+      <button class="tab" data-tab="templates">Templates</button>
+      <button class="tab" data-tab="compare">Compare</button>
+    </div>
+
+    <!-- Prompt Tab -->
+    <div id="promptTab" class="tab-content active">
+      <!-- Presets -->
+      <div class="presets-bar">
+        <span class="presets-label">Preset:</span>
+        <div id="presetsList" class="presets-list">
+          <button class="preset-btn active" data-preset="quick">Quick</button>
+          <button class="preset-btn" data-preset="learning">Learning</button>
+          <button class="preset-btn" data-preset="docs">Docs</button>
+        </div>
+      </div>
+
+      <!-- Token Counter -->
+      <div class="token-counter" id="tokenCounter">
+        <span class="token-label">Tokens:</span>
+        <span id="tokenCount">0</span>
+        <span id="tokenSavings" class="token-savings hidden"></span>
+      </div>
+
+      <!-- Input -->
+      <div class="input-group">
+        <label for="rawPrompt">Your Prompt</label>
+        <textarea id="rawPrompt" placeholder="Enter your prompt here... (Ctrl+Shift+Enter to optimize)"></textarea>
+      </div>
+
+      <!-- Options Row -->
+      <div class="options-row">
+        <label class="checkbox-inline">
+          <input type="checkbox" id="scrapeClaude">
+          <span>Include Claude context</span>
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" id="autoOptimize">
+          <span>Auto-optimize</span>
+        </label>
+      </div>
+
+      <!-- File Input -->
+      <div class="input-group">
+        <label for="fileInput">
+          Attach Files
+          <span class="optional">(optional)</span>
+        </label>
+        <input type="file" id="fileInput" multiple accept=".txt,.js,.ts,.jsx,.tsx,.html,.css,.md,.json,.py,.java,.cpp,.c,.rs,.go,.sql,.sh">
+        <div id="fileList" class="file-list"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button id="optimizeBtn" class="btn btn-primary">
+          <span class="btn-text">Optimize</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </div>
+
+      <!-- Status -->
+      <div id="status" class="status"></div>
+
+      <!-- Output -->
+      <div class="output-group hidden" id="outputGroup">
+        <div class="output-header">
+          <label for="optimizedPrompt">Optimized Prompt</label>
+          <div class="output-stats">
+            <span id="outputTokens" class="stat"></span>
+            <span id="savingsPercent" class="stat savings"></span>
+          </div>
+        </div>
+        <textarea id="optimizedPrompt" readonly></textarea>
+        <div class="output-actions">
+          <button id="copyBtn" class="btn btn-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy
+          </button>
+          <button id="pasteToClaudeBtn" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            Paste to Claude
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Templates Tab -->
+    <div id="templatesTab" class="tab-content hidden">
+      <div class="templates-grid" id="templatesGrid">
+        <!-- Templates will be loaded here -->
+      </div>
+      <button id="addTemplateBtn" class="btn btn-secondary btn-full">
+        + Create Custom Template
+      </button>
+    </div>
+
+    <!-- Compare Tab -->
+    <div id="compareTab" class="tab-content hidden">
+      <div class="compare-container">
+        <div class="compare-panel">
+          <h3>Original</h3>
+          <div id="originalDiff" class="diff-content"></div>
+        </div>
+        <div class="compare-panel">
+          <h3>Optimized</h3>
+          <div id="optimizedDiff" class="diff-content"></div>
+        </div>
+      </div>
+      <div id="diffStats" class="diff-stats"></div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>History</h2>
+          <button id="closeHistoryBtn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="historyList" class="history-list">
+            <!-- History items will be loaded here -->
+          </div>
+          <div id="historyEmpty" class="empty-state hidden">
+            <p>No history yet. Start optimizing prompts!</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="clearHistoryBtn" class="btn btn-danger">Clear All</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div id="templateModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Create Template</h2>
+          <button id="closeTemplateBtn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <label for="templateName">Template Name</label>
+            <input type="text" id="templateName" placeholder="e.g., API Documentation">
+          </div>
+          <div class="input-group">
+            <label for="templateIcon">Icon (emoji)</label>
+            <input type="text" id="templateIcon" placeholder="e.g., 📋" maxlength="2">
+          </div>
+          <div class="input-group">
+            <label for="templatePrompt">Prompt Template</label>
+            <textarea id="templatePrompt" placeholder="Enter your template prompt..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelTemplateBtn" class="btn btn-secondary">Cancel</button>
+          <button id="saveTemplateBtn" class="btn btn-primary">Save Template</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
